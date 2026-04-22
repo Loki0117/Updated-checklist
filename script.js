@@ -561,77 +561,178 @@
         }
     }
 
-    function downloadPDF() {
-        const data = collectFormData();
-        const grouped = getSelectedItemsGrouped();
-        const totalSelected = Object.values(grouped).flat().length;
-        
-        const container = document.createElement('div');
-        container.style.cssText = 'padding:30px; font-family:Arial,sans-serif; width:720px; background:white;';
-        
-        let servicesHTML = '';
-        for (let cat in grouped) {
+   function downloadPDF() {
+    const data = collectFormData();
+    const grouped = getSelectedItemsGrouped();
+    const totalSelected = Object.values(grouped).flat().length;
+    
+    // Create a styled container for PDF
+    const container = document.createElement('div');
+    container.style.cssText = 'padding:30px; font-family:Arial,sans-serif; width:100%; max-width:800px; background:white; color:#333; line-height:1.5;';
+    
+    // Build services HTML with proper categories
+    let servicesHTML = '';
+    const categoryOrder = ['stationery', 'hotels', 'transport', 'hampers', 'artists', 'vendors', 'other', 'addons'];
+    
+    for (let cat of categoryOrder) {
+        if (grouped[cat] && grouped[cat].length > 0) {
             const catName = categories.find(c => c.id === cat)?.name || cat;
-            servicesHTML += `<div style="margin-bottom:15px;">
-                <div style="background:#fff3e0; padding:8px; font-weight:bold; border-left:4px solid #e85d04;">${catName}</div>`;
-            grouped[cat].forEach(item => {
-                servicesHTML += `<div style="padding:6px 12px; border-bottom:1px solid #f0e0d0;">✓ ${item.title} <span style="color:#666; font-size:12px;">- ${item.desc}</span></div>`;
-            });
-            servicesHTML += `</div>`;
+            servicesHTML += `
+                <div style="margin-bottom:20px; page-break-inside:avoid;">
+                    <div style="background:#fff3e0; padding:10px 15px; font-weight:bold; border-left:4px solid #e85d04; margin-bottom:10px; border-radius:4px;">
+                        📌 ${catName} (${grouped[cat].length} items)
+                    </div>
+                    <table style="width:100%; border-collapse:collapse;">
+                        ${grouped[cat].map(item => `
+                            <tr style="border-bottom:1px solid #f0e0d0;">
+                                <td style="padding:8px 12px; width:5%;">✓</td>
+                                <td style="padding:8px 12px; width:40%; font-weight:500;">${item.title}</td>
+                                <td style="padding:8px 12px; width:55%; color:#666; font-size:12px;">${item.desc}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                </div>
+            `;
         }
-        
-        container.innerHTML = `
-            <div style="text-align:center; border-bottom:3px solid #e85d04; padding-bottom:15px; margin-bottom:20px;">
-                <h1 style="color:#e85d04; margin:0;">Oh Yes Events</h1>
-                <h2 style="margin:5px 0; color:#555;">Wedding Planning Summary</h2>
-            </div>
-            
-            <div style="background:#fef8f2; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0;">👰‍♀️ Client Details</h3>
-                <p><strong>Name:</strong> ${data.clientName}</p>
-                <p><strong>Phone:</strong> ${data.contactNumber}</p>
-                <p><strong>Email:</strong> ${data.email}</p>
-            </div>
-            
-            <div style="background:#fef8f2; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0;">🎉 Event Details</h3>
-                <p><strong>Event Type:</strong> ${data.eventType}</p>
-                <p><strong>Event Date:</strong> ${data.eventDate}</p>
-                <p><strong>Venue:</strong> ${data.venue}</p>
-                <p><strong>Guest Count:</strong> ${data.guestCount}</p>
-                <p><strong>Function Days:</strong> ${data.functionDays}</p>
-            </div>
-            
-            <div style="background:#fef8f2; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0;">💰 Budget</h3>
-                <p><strong>Total Budget:</strong> ₹${parseInt(data.totalBudget || 0).toLocaleString('en-IN')}</p>
-                <p><strong>Budget Status:</strong> ${data.budgetStatus}</p>
-                <p><strong>Where to Splurge:</strong> ${data.budgetBreakdown || 'Not specified'}</p>
-            </div>
-            
-            <div style="background:#fef8f2; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0;">⭐ Must-Haves</h3>
-                <p>${data.nonNegotiables}</p>
-                ${data.restrictions ? `<p><strong>Things to Avoid:</strong> ${data.restrictions}</p>` : ''}
-                ${data.criticalDeadlines ? `<p><strong>Important Deadlines:</strong> ${data.criticalDeadlines}</p>` : ''}
-            </div>
-            
-            <div style="margin-bottom:20px;">
-                <h3 style="color:#e85d04; border-bottom:2px solid #e85d04; padding-bottom:5px;">✅ Selected Services (${totalSelected} items)</h3>
-                ${totalSelected === 0 ? '<p style="color:#888;">No services selected.</p>' : servicesHTML}
-            </div>
-            
-            <div style="text-align:center; margin-top:30px; padding-top:15px; border-top:2px solid #e85d04; color:#888; font-size:12px;">
-                <p>Oh Yes Events — Let's create magic! ✨</p>
-                <p>Generated on ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-        `;
-        
-        html2pdf().set({ 
-            filename: `OhYes_${data.clientName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-            margin: [0.5, 0.5, 0.5, 0.5]
-        }).from(container).save();
     }
+    
+    // If no services selected
+    if (servicesHTML === '') {
+        servicesHTML = '<p style="color:#888; font-style:italic;">No services selected yet.</p>';
+    }
+    
+    // Format date properly
+    const formatDate = (dateStr) => {
+        if (!dateStr) return 'Not specified';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+    };
+    
+    // Build complete HTML for PDF
+    container.innerHTML = `
+        <div style="text-align:center; border-bottom:3px solid #e85d04; padding-bottom:15px; margin-bottom:25px;">
+            <h1 style="color:#e85d04; margin:0; font-size:28px;">Oh Yes Events</h1>
+            <h2 style="margin:8px 0 5px; color:#555; font-size:18px;">Wedding Planning Summary</h2>
+            <p style="color:#888; font-size:11px; margin:0;">Generated on ${new Date().toLocaleString('en-IN')}</p>
+        </div>
+        
+        <!-- CLIENT DETAILS -->
+        <div style="background:#fef8f2; padding:15px 20px; border-radius:8px; margin-bottom:20px; page-break-inside:avoid;">
+            <h3 style="color:#e85d04; margin:0 0 12px 0; font-size:16px; border-bottom:1px solid #f5c8a0; padding-bottom:5px;">👰‍♀️ Client Details</h3>
+            <table style="width:100%;">
+                <tr><td style="padding:5px 0; width:35%; color:#666;">Name</td><td style="padding:5px 0; font-weight:bold;">${data.clientName}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Phone</td><td style="padding:5px 0;">${data.contactNumber}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Email</td><td style="padding:5px 0;">${data.email}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Newsletter</td><td style="padding:5px 0;">${data.newsletter ? 'Yes, please send tips' : 'No thanks'}</td></tr>
+            </table>
+        </div>
+        
+        <!-- EVENT DETAILS -->
+        <div style="background:#fef8f2; padding:15px 20px; border-radius:8px; margin-bottom:20px; page-break-inside:avoid;">
+            <h3 style="color:#e85d04; margin:0 0 12px 0; font-size:16px; border-bottom:1px solid #f5c8a0; padding-bottom:5px;">🎉 Event Details</h3>
+            <table style="width:100%;">
+                <tr><td style="padding:5px 0; width:35%; color:#666;">Event Type</td><td style="padding:5px 0; font-weight:bold;">${data.eventType}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Event Date</td><td style="padding:5px 0;">${formatDate(data.eventDate)}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Venue</td><td style="padding:5px 0;">${data.venue}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Guest Count</td><td style="padding:5px 0;">${data.guestCount} guests</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Function Days</td><td style="padding:5px 0;">${data.functionDays} day(s)</td></tr>
+            </table>
+        </div>
+        
+        <!-- BUDGET DETAILS -->
+        <div style="background:#fef8f2; padding:15px 20px; border-radius:8px; margin-bottom:20px; page-break-inside:avoid;">
+            <h3 style="color:#e85d04; margin:0 0 12px 0; font-size:16px; border-bottom:1px solid #f5c8a0; padding-bottom:5px;">💰 Budget Information</h3>
+            <table style="width:100%;">
+                <tr><td style="padding:5px 0; width:35%; color:#666;">Total Budget</td><td style="padding:5px 0; font-weight:bold; color:#e85d04;">₹${parseInt(data.totalBudget || 0).toLocaleString('en-IN')}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Budget Status</td><td style="padding:5px 0;">${data.budgetStatus}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Where to Splurge</td><td style="padding:5px 0;">${data.budgetBreakdown || 'Not specified'}</td></tr>
+            </table>
+        </div>
+        
+        <!-- PREFERENCES -->
+        <div style="background:#fef8f2; padding:15px 20px; border-radius:8px; margin-bottom:20px; page-break-inside:avoid;">
+            <h3 style="color:#e85d04; margin:0 0 12px 0; font-size:16px; border-bottom:1px solid #f5c8a0; padding-bottom:5px;">🎨 Style & Preferences</h3>
+            <table style="width:100%;">
+                <tr><td style="padding:5px 0; width:35%; color:#666;">Color / Theme</td><td style="padding:5px 0;">${data.colorPalette || 'Not specified'}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Inspiration Links</td><td style="padding:5px 0;">${data.referenceLinks || 'None shared'}</td></tr>
+                <tr><td style="padding:5px 0; color:#666;">Top Priorities</td><td style="padding:5px 0;">${data.priorities || 'Not selected'}</td></tr>
+            </table>
+        </div>
+        
+        <!-- MUST HAVES & RESTRICTIONS -->
+        <div style="background:#fef8f2; padding:15px 20px; border-radius:8px; margin-bottom:20px; page-break-inside:avoid;">
+            <h3 style="color:#e85d04; margin:0 0 12px 0; font-size:16px; border-bottom:1px solid #f5c8a0; padding-bottom:5px;">⭐ Must-Haves & Restrictions</h3>
+            <p style="margin:0 0 8px 0;"><strong>Non-Negotiables:</strong></p>
+            <p style="margin:0 0 15px 0; padding:8px 12px; background:white; border-radius:6px; border-left:3px solid #e85d04;">${data.nonNegotiables}</p>
+            <p style="margin:0 0 8px 0;"><strong>Things to Avoid:</strong></p>
+            <p style="margin:0 0 15px 0; padding:8px 12px; background:white; border-radius:6px;">${data.restrictions || 'None specified'}</p>
+            <p style="margin:0 0 8px 0;"><strong>Important Deadlines:</strong></p>
+            <p style="margin:0; padding:8px 12px; background:white; border-radius:6px;">${data.criticalDeadlines || 'None specified'}</p>
+        </div>
+        
+        <!-- SELECTED SERVICES -->
+        <div style="margin-top:25px;">
+            <h3 style="color:#e85d04; font-size:18px; border-bottom:2px solid #e85d04; padding-bottom:8px; margin-bottom:15px;">
+                ✅ Selected Services 
+                <span style="font-size:12px; color:#888; font-weight:normal;">(${totalSelected} item${totalSelected !== 1 ? 's' : ''})</span>
+            </h3>
+            ${servicesHTML}
+        </div>
+        
+        <!-- FOOTER -->
+        <div style="margin-top:35px; text-align:center; border-top:2px solid #e85d04; padding-top:15px; font-size:11px; color:#888;">
+            <p style="margin:0; font-size:13px; color:#e85d04; font-weight:bold;">Oh Yes Events</p>
+            <p style="margin:5px 0 0;">Let's create magic ✨ — Your wedding, our passion</p>
+            <p style="margin:5px 0 0;">${new Date().toLocaleString('en-IN')}</p>
+        </div>
+    `;
+    
+    // PDF options with better page break handling
+    const opt = {
+        margin: [0.5, 0.5, 0.5, 0.5],
+        filename: `OhYes_${data.clientName.replace(/[^a-zA-Z0-9]/g, '_')}_Wedding_Plan.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            logging: false,
+            letterRendering: true
+        },
+        jsPDF: { 
+            unit: 'in', 
+            format: 'a4', 
+            orientation: 'portrait' 
+        },
+        pagebreak: { 
+            mode: ['css', 'legacy'],
+            before: '.page-break',
+            after: '.avoid-break'
+        }
+    };
+    
+    // Show loading on button
+    const btn = document.getElementById('downloadPdfFromSuccess');
+    const originalText = btn?.textContent || 'Download PDF';
+    if (btn) {
+        btn.textContent = '⏳ Generating PDF...';
+        btn.disabled = true;
+    }
+    
+    // Generate PDF
+    html2pdf().set(opt).from(container).save().then(() => {
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+    }).catch((error) => {
+        console.error('PDF generation error:', error);
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+        alert('PDF generation failed, but your form was submitted successfully!');
+    });
+}
 
     function resetForm() {
         itemsState.fill(false);
