@@ -2,28 +2,26 @@
     "use strict";
 
     // ========================
-    // EMAILJS CONFIGURATION - REPLACE WITH YOUR KEYS
+    // EMAILJS CONFIGURATION
     // ========================
     const EMAILJS_CONFIG = {
-        PUBLIC_KEY: "f93M_sIhhbMCw4cVt",     // Get from EmailJS dashboard
-        SERVICE_ID: "service_vuepezd",             // Your EmailJS service ID
-        TEMPLATE_ID: "template_casfjzj"            // Your EmailJS template ID
+        PUBLIC_KEY: "f93M_sIhhbMCw4cVt",
+        SERVICE_ID: "service_vuepezd",
+        TEMPLATE_ID: "template_casfjzj"
     };
 
-    // Initialize EmailJS if keys are provided
-          let emailJSEnabled = false;
-
-      if (typeof emailjs !== 'undefined') {
-          try {
-              emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
-              emailJSEnabled = true;
-              console.log("✅ EmailJS initialized successfully");
-          } catch (e) {
-              console.warn("EmailJS init failed:", e);
-          }
-      } else {
-          console.warn("❌ EmailJS library not loaded");
-      }
+    let emailJSEnabled = false;
+    if (typeof emailjs !== 'undefined') {
+        try {
+            emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+            emailJSEnabled = true;
+            console.log("✅ EmailJS initialized successfully");
+        } catch (e) {
+            console.warn("EmailJS init failed:", e);
+        }
+    } else {
+        console.warn("❌ EmailJS library not loaded");
+    }
 
     // ========================
     // CHECKLIST DATA (90 items)
@@ -68,14 +66,14 @@
         { category: 'hotels', title: 'Check-in Coordination', desc: 'Smooth arrival', tag: 'Essential' },
         { category: 'hotels', title: 'VIP Guest Accommodation', desc: 'Special family rooms', tag: 'Essential' },
         { category: 'hotels', title: 'Bridal Suite Preparation', desc: 'Getting ready space', tag: 'Essential' },
-        { category: 'hotels', title: 'Groom\'s Room Arrangement', desc: 'Preparation area', tag: 'Essential' },
+        { category: 'hotels', title: "Groom's Room Arrangement", desc: 'Preparation area', tag: 'Essential' },
         { category: 'hotels', title: 'Hotel Staff Briefing', desc: 'Service coordination', tag: 'Essential' },
         { category: 'hotels', title: 'Late Check-out Requests', desc: 'Extended stay', tag: 'Optional' },
         { category: 'hotels', title: 'Luggage Handling Service', desc: 'Bell desk', tag: 'Optional' },
         { category: 'hotels', title: 'Concierge Coordination', desc: 'Guest assistance', tag: 'Essential' },
         { category: 'transport', title: 'Guest Airport Transfers', desc: 'Pickup & drop', tag: 'Essential' },
         { category: 'transport', title: 'Bridal Car / Vintage Car', desc: 'Bride arrival', tag: 'Essential' },
-        { category: 'transport', title: 'Groom\'s Arrival Vehicle', desc: 'Groom transport', tag: 'Essential' },
+        { category: 'transport', title: "Groom's Arrival Vehicle", desc: 'Groom transport', tag: 'Essential' },
         { category: 'transport', title: 'Family Shuttles', desc: 'Group transport', tag: 'Essential' },
         { category: 'transport', title: 'Artist & Vendor Transport', desc: 'Logistics', tag: 'Essential' },
         { category: 'transport', title: 'Return Transfers', desc: 'Post-event', tag: 'Essential' },
@@ -85,7 +83,7 @@
         { category: 'transport', title: 'Local Guest Buses', desc: 'Group transport', tag: 'Essential' },
         { category: 'hampers', title: 'Welcome Hampers', desc: 'Arrival gifts', tag: 'Essential' },
         { category: 'hampers', title: 'Bridal Party Gift Boxes', desc: 'Bridesmaids gifts', tag: 'Essential' },
-        { category: 'hampers', title: 'Groom\'s Squad Kits', desc: 'Groomsmen gifts', tag: 'Essential' },
+        { category: 'hampers', title: "Groom's Squad Kits", desc: 'Groomsmen gifts', tag: 'Essential' },
         { category: 'hampers', title: 'Return Gifts', desc: 'Guest favors', tag: 'Essential' },
         { category: 'hampers', title: 'Eco-friendly Favors', desc: 'Sustainable options', tag: 'Optional' },
         { category: 'hampers', title: 'Personalized Mementos', desc: 'Custom keepsakes', tag: 'Optional' },
@@ -164,6 +162,22 @@
     const formContainer = document.getElementById('formContainer');
     const successPanel = document.getElementById('successPanel');
 
+    // ========================
+    // FIX 1: SUBMIT BUTTON — prevent double-click, show loading state
+    // ========================
+    let isSubmitting = false;
+
+    function setSubmitLoading(loading) {
+        if (!submitBtn) return;
+        if (loading) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Submitting...';
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit & Get Your Plan';
+        }
+    }
+
     // Helper: clear errors
     function clearErrors() {
         document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
@@ -181,7 +195,7 @@
     function renderTabs() {
         const container = document.getElementById('categoryTabs');
         if (!container) return;
-        container.innerHTML = categories.map(cat => 
+        container.innerHTML = categories.map(cat =>
             `<span class="cat-tab ${cat.id === currentCategory ? 'active' : ''}" data-cat="${cat.id}">${cat.name}</span>`
         ).join('');
         document.querySelectorAll('.cat-tab').forEach(tab => {
@@ -232,7 +246,7 @@
         }
         container.innerHTML = html;
         document.querySelectorAll('.checklist-item').forEach(el => {
-            el.addEventListener('click', (e) => {
+            el.addEventListener('click', () => {
                 const idx = parseInt(el.dataset.index);
                 if (!isNaN(idx)) {
                     itemsState[idx] = !itemsState[idx];
@@ -320,10 +334,11 @@
         clearErrors();
     }
 
+    // ========================
+    // FIX 2: collectFormData — added referenceLinks and criticalDeadlines
+    // ========================
     function collectFormData() {
-        // Get selected priority items
         const priorities = Array.from(document.querySelectorAll('.priority-item input:checked')).map(cb => cb.value);
-        
         return {
             clientName: document.getElementById('clientName')?.value || '',
             contactNumber: document.getElementById('contactNumber')?.value || '',
@@ -337,6 +352,9 @@
             budgetStatus: document.getElementById('budgetStatus')?.value || '',
             budgetBreakdown: document.getElementById('budgetBreakdown')?.value || '',
             colorPalette: document.getElementById('colorPalette')?.value || '',
+            // ✅ FIXED: these two fields were missing before
+            referenceLinks: document.getElementById('referenceLinks')?.value || '',
+            criticalDeadlines: document.getElementById('criticalDeadlines')?.value || '',
             nonNegotiables: document.getElementById('nonNegotiables')?.value || '',
             restrictions: document.getElementById('restrictions')?.value || '',
             priorities: priorities.join(', '),
@@ -383,95 +401,135 @@
         }
         html += `</ul>`;
         return html;
-            }
-            
-            function downloadPDF() {
-            const data = collectFormData();
-            const grouped = getSelectedItemsGrouped();
-            const totalSelected = Object.values(grouped).flat().length;
+    }
 
-            const container = document.createElement('div');
-            container.style.padding = '30px';
-            container.style.fontFamily = 'Arial, sans-serif';
-            container.style.color = '#333';
-            container.style.width = '800px';
+    // ========================
+    // FIX 3: downloadPDF — added all missing fields + proper page break handling
+    // ========================
+    function downloadPDF() {
+        const data = collectFormData();
+        const grouped = getSelectedItemsGrouped();
+        const totalSelected = Object.values(grouped).flat().length;
+        const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) : 'N/A';
 
-            const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : 'N/A';
+        const container = document.createElement('div');
+        container.style.cssText = 'padding:30px; font-family:Arial,sans-serif; color:#333; width:720px; font-size:13px; line-height:1.6;';
 
-            let html = `
-                <div style="text-align:center; border-bottom:3px solid #e85d04; padding-bottom:15px; margin-bottom:20px;">
-                    <h1 style="color:#e85d04;">Oh Yes Events</h1>
-                    <h2>Wedding Requirement Summary</h2>
-                    <p style="font-size:12px;">Generated on ${new Date().toLocaleString()}</p>
-                </div>
-
-                <h3>📋 Client Details</h3>
-                <p><strong>Name:</strong> ${data.clientName}</p>
-                <p><strong>Phone:</strong> ${data.contactNumber}</p>
-                <p><strong>Email:</strong> ${data.email}</p>
-
-                <h3>🎉 Event Details</h3>
-                <p><strong>Type:</strong> ${data.eventType}</p>
-                <p><strong>Date:</strong> ${formatDate(data.eventDate)}</p>
-                <p><strong>Venue:</strong> ${data.venue}</p>
-                <p><strong>Guests:</strong> ${data.guestCount}</p>
-                <p><strong>Function Days:</strong> ${data.functionDays}</p>
-
-                <h3>💰 Budget</h3>
-                <p><strong>Total:</strong> ₹${parseInt(data.totalBudget || 0).toLocaleString('en-IN')}</p>
-                <p><strong>Status:</strong> ${data.budgetStatus}</p>
-                <p><strong>Breakdown:</strong> ${data.budgetBreakdown || "Not specified"}</p>
-
-                <h3>🎨 Preferences</h3>
-                <p><strong>Color Theme:</strong> ${data.colorPalette || "Not specified"}</p>
-
-                <h3>⭐ Priorities</h3>
-                <p>${data.priorities || "Not selected"}</p>
-
-                <h3>⚠️ Must-Haves</h3>
-                <p>${data.nonNegotiables}</p>
-
-                <h3>🚫 Restrictions</h3>
-                <p>${data.restrictions || "None"}</p>
-
-                <h3>📦 Selected Services (${totalSelected})</h3>
-            `;
-
-            for (let cat in grouped) {
-                const catName = categories.find(c => c.id === cat)?.name || cat;
-                html += `<h4>${catName}</h4><ul>`;
-                grouped[cat].forEach(item => {
-                    html += `<li>${item.title} – ${item.desc}</li>`;
-                });
-                html += `</ul>`;
-            }
-
-            html += `
-                <div style="margin-top:30px; text-align:center; font-size:12px; color:#888;">
-                    Newsletter Opt-in: ${data.newsletter ? "Yes" : "No"}<br><br>
-                    Oh Yes Events — Let's create magic ✨
-                </div>
-            `;
-
-            container.innerHTML = html;
-
-            const opt = {
-                margin: 0.5,
-                filename: `OhYes_${data.clientName.replace(/\s/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4' }
-            };
-
-            html2pdf().set(opt).from(container).save();
+        // Build services HTML
+        let servicesHTML = '';
+        for (let cat in grouped) {
+            const catName = categories.find(c => c.id === cat)?.name || cat;
+            servicesHTML += `
+                <div style="margin-bottom:10px; page-break-inside:avoid;">
+                    <div style="background:#fff3e0; padding:5px 10px; border-left:4px solid #e85d04; font-weight:bold; margin-bottom:4px;">${catName}</div>
+                    <table style="width:100%; border-collapse:collapse;">
+                        ${grouped[cat].map(item => `
+                            <tr>
+                                <td style="padding:4px 8px; border-bottom:1px solid #f0e0d0; width:50%;">✓ ${item.title}</td>
+                                <td style="padding:4px 8px; border-bottom:1px solid #f0e0d0; color:#666;">${item.desc}</td>
+                                <td style="padding:4px 8px; border-bottom:1px solid #f0e0d0; color:${item.tag === 'Essential' ? '#e85d04' : '#888'}; font-size:11px;">${item.tag}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                </div>`;
         }
-            // ========================
-    // EMAILJS SEND FUNCTION (UPDATED)
+
+        container.innerHTML = `
+            <!-- HEADER -->
+            <div style="text-align:center; border-bottom:3px solid #e85d04; padding-bottom:15px; margin-bottom:20px;">
+                <h1 style="color:#e85d04; margin:0; font-size:26px;">Oh Yes Events</h1>
+                <h2 style="margin:5px 0; font-size:16px; color:#555;">Wedding Requirement Summary</h2>
+                <p style="font-size:11px; color:#888; margin:0;">Generated on ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+
+            <!-- CLIENT DETAILS -->
+            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">📋 Client Details</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr><td style="padding:3px 0; width:35%; color:#666;">Name</td><td style="padding:3px 0; font-weight:bold;">${data.clientName}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Phone</td><td style="padding:3px 0;">${data.contactNumber}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Email</td><td style="padding:3px 0;">${data.email}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Newsletter Opt-in</td><td style="padding:3px 0;">${data.newsletter ? 'Yes' : 'No'}</td></tr>
+                </table>
+            </div>
+
+            <!-- EVENT DETAILS -->
+            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">🎉 Event Details</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr><td style="padding:3px 0; width:35%; color:#666;">Event Type</td><td style="padding:3px 0; font-weight:bold;">${data.eventType}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Date</td><td style="padding:3px 0;">${formatDate(data.eventDate)}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Venue</td><td style="padding:3px 0;">${data.venue}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Guest Count</td><td style="padding:3px 0;">${data.guestCount} guests</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Function Days</td><td style="padding:3px 0;">${data.functionDays} day(s)</td></tr>
+                </table>
+            </div>
+
+            <!-- BUDGET -->
+            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">💰 Budget</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr><td style="padding:3px 0; width:35%; color:#666;">Total Budget</td><td style="padding:3px 0; font-weight:bold;">₹${parseInt(data.totalBudget || 0).toLocaleString('en-IN')}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Budget Status</td><td style="padding:3px 0;">${data.budgetStatus}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Where to Splurge</td><td style="padding:3px 0;">${data.budgetBreakdown || 'Not specified'}</td></tr>
+                </table>
+            </div>
+
+            <!-- PREFERENCES -->
+            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">🎨 Preferences & Vision</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr><td style="padding:3px 0; width:35%; color:#666;">Color / Theme</td><td style="padding:3px 0;">${data.colorPalette || 'Not specified'}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Inspiration Links</td><td style="padding:3px 0;">${data.referenceLinks || 'None shared'}</td></tr>
+                    <tr><td style="padding:3px 0; color:#666;">Top Priorities</td><td style="padding:3px 0;">${data.priorities || 'Not selected'}</td></tr>
+                </table>
+            </div>
+
+            <!-- MUST HAVES & RESTRICTIONS -->
+            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">⭐ Must-Haves & Restrictions</h3>
+                <p style="margin:0 0 8px 0;"><strong>Non-Negotiables:</strong></p>
+                <p style="margin:0 0 12px 0; padding-left:10px; border-left:3px solid #e85d04;">${data.nonNegotiables}</p>
+                <p style="margin:0 0 6px 0;"><strong>Things to Avoid:</strong></p>
+                <p style="margin:0 0 12px 0; padding-left:10px;">${data.restrictions || 'None specified'}</p>
+                <p style="margin:0 0 6px 0;"><strong>Important Deadlines:</strong></p>
+                <p style="margin:0; padding-left:10px;">${data.criticalDeadlines || 'None specified'}</p>
+            </div>
+
+            <!-- SELECTED SERVICES -->
+            <div style="margin-bottom:20px;">
+                <h3 style="color:#e85d04; font-size:14px; border-bottom:2px solid #e85d04; padding-bottom:6px; margin-bottom:12px;">
+                    📦 Selected Services — ${totalSelected} item${totalSelected !== 1 ? 's' : ''} across ${Object.keys(grouped).length} categor${Object.keys(grouped).length !== 1 ? 'ies' : 'y'}
+                </h3>
+                ${totalSelected === 0 ? '<p style="color:#888; font-style:italic;">No services selected.</p>' : servicesHTML}
+            </div>
+
+            <!-- FOOTER -->
+            <div style="margin-top:30px; text-align:center; border-top:2px solid #e85d04; padding-top:14px; font-size:11px; color:#888;">
+                <p style="margin:0; font-size:13px; color:#e85d04; font-weight:bold;">Oh Yes Events</p>
+                <p style="margin:4px 0 0;">Let's create magic ✨ — Your wedding, our passion</p>
+            </div>
+        `;
+
+        const opt = {
+            margin: [0.4, 0.4, 0.4, 0.4],
+            filename: `OhYes_${data.clientName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        return html2pdf().set(opt).from(container).save();
+    }
+
+    // ========================
+    // EMAILJS SEND FUNCTION
     // ========================
     async function sendEmailWithEmailJS() {
         const statusDiv = document.getElementById('emailStatus');
+
         if (!emailJSEnabled) {
-            // Fallback to mailto if EmailJS not configured
             sendEmailFallback();
             return;
         }
@@ -479,10 +537,10 @@
         const data = collectFormData();
         const selectedItemsText = getSelectedItemsText();
         const totalSelected = itemsState.filter(v => v).length;
-        
-        // Prepare email template parameters
+
+        // ✅ FIX: added all missing fields — referenceLinks, criticalDeadlines
         const templateParams = {
-            to_email: "kisneylogesh78823@gmail.com",  // YOUR EMAIL
+            to_email: "kisneylogesh78823@gmail.com",
             client_name: data.clientName,
             client_phone: data.contactNumber,
             client_email: data.email,
@@ -493,20 +551,22 @@
             function_days: data.functionDays,
             total_budget: `₹${parseInt(data.totalBudget || 0).toLocaleString('en-IN')}`,
             budget_status: data.budgetStatus,
-            budget_breakdown: data.budgetBreakdown || "Not specified",
-            color_palette: data.colorPalette || "Not specified",
+            budget_breakdown: data.budgetBreakdown || 'Not specified',
+            color_palette: data.colorPalette || 'Not specified',
+            reference_links: data.referenceLinks || 'None',
+            critical_deadlines: data.criticalDeadlines || 'None',
             non_negotiables: data.nonNegotiables,
-            restrictions: data.restrictions || "None",
-            priorities: data.priorities || "Not specified",
-            selected_services: selectedItemsText || "No services selected",
+            restrictions: data.restrictions || 'None',
+            priorities: data.priorities || 'Not specified',
+            selected_services: selectedItemsText || 'No services selected',
             total_services_selected: totalSelected,
-            newsletter_opt_in: data.newsletter ? "Yes" : "No",
+            newsletter_opt_in: data.newsletter ? 'Yes' : 'No',
             submission_date: new Date().toLocaleString('en-IN')
         };
 
         if (statusDiv) {
-            statusDiv.innerHTML = "📧 Sending email via EmailJS...";
-            statusDiv.style.color = "#e85d04";
+            statusDiv.innerHTML = '📧 Sending email...';
+            statusDiv.style.color = '#e85d04';
         }
 
         try {
@@ -515,18 +575,17 @@
                 EMAILJS_CONFIG.TEMPLATE_ID,
                 templateParams
             );
-            console.log("EmailJS success:", response);
+            console.log('EmailJS success:', response);
             if (statusDiv) {
-                statusDiv.innerHTML = "✅ Email sent successfully! Your wedding plan has been delivered.";
-                statusDiv.style.color = "#2e7d32";
+                statusDiv.innerHTML = '✅ Email sent successfully! Your wedding plan has been delivered.';
+                statusDiv.style.color = '#2e7d32';
             }
         } catch (error) {
-            console.error("EmailJS error:", error);
+            console.error('EmailJS error:', error);
             if (statusDiv) {
-                statusDiv.innerHTML = "⚠️ Email failed. Opening email client as backup...";
-                statusDiv.style.color = "#d32f2f";
+                statusDiv.innerHTML = '⚠️ Email failed. Opening email client as backup...';
+                statusDiv.style.color = '#d32f2f';
             }
-            // Fallback to mailto
             setTimeout(() => sendEmailFallback(), 1000);
         }
     }
@@ -534,7 +593,7 @@
     function sendEmailFallback() {
         const data = collectFormData();
         const grouped = getSelectedItemsGrouped();
-        let body = `CLIENT: ${data.clientName}\nPhone: ${data.contactNumber}\nEmail: ${data.email}\nEvent: ${data.eventType} on ${data.eventDate}\nVenue: ${data.venue}\nGuests: ${data.guestCount}\nBudget: ₹${data.totalBudget}\nMust-haves: ${data.nonNegotiables}\n\nSELECTED SERVICES:\n`;
+        let body = `CLIENT: ${data.clientName}\nPhone: ${data.contactNumber}\nEmail: ${data.email}\nEvent: ${data.eventType} on ${data.eventDate}\nVenue: ${data.venue}\nGuests: ${data.guestCount}\nFunction Days: ${data.functionDays}\nBudget: ₹${data.totalBudget} (${data.budgetStatus})\nColors: ${data.colorPalette || 'N/A'}\nLinks: ${data.referenceLinks || 'N/A'}\nDeadlines: ${data.criticalDeadlines || 'N/A'}\nMust-haves: ${data.nonNegotiables}\nRestrictions: ${data.restrictions || 'None'}\n\nSELECTED SERVICES:\n`;
         for (let cat in grouped) {
             body += `\n${categories.find(c => c.id === cat)?.name || cat}:\n`;
             grouped[cat].forEach(i => body += `  ✓ ${i.title}\n`);
@@ -544,44 +603,97 @@
         if (statusDiv) statusDiv.innerHTML = '📧 Email client opened.';
     }
 
-    function generateAndSendEmail() {
-        sendEmailWithEmailJS();
-    }
-
+    // ========================
+    // FIX 1 (continued): showSuccess — no longer auto-triggers PDF on mobile
+    // Instead shows success screen, user clicks button to download
+    // ========================
     function showSuccess() {
-        const clientName = document.getElementById('clientName')?.value || 'Friend';
-        const firstName = clientName.split('&')[0].split(' ')[0];
-        const successSpan = document.getElementById('successClientName');
-        if (successSpan) successSpan.innerText = firstName;
-        const summaryDiv = document.getElementById('summaryContent');
-        if (summaryDiv) summaryDiv.innerHTML = generateSummaryHTML();
-        if (formContainer) formContainer.style.display = 'none';
-        if (successPanel) successPanel.style.display = 'block';
-        setTimeout(() => { downloadPDF(); }, 300);
+        if (isSubmitting) return;
+        isSubmitting = true;
+        setSubmitLoading(true);
+
+        try {
+            const clientName = document.getElementById('clientName')?.value || 'Friend';
+            const firstName = clientName.split('&')[0].trim().split(' ')[0];
+            const successSpan = document.getElementById('successClientName');
+            if (successSpan) successSpan.innerText = firstName;
+
+            const summaryDiv = document.getElementById('summaryContent');
+            if (summaryDiv) summaryDiv.innerHTML = generateSummaryHTML();
+
+            if (formContainer) formContainer.style.display = 'none';
+            if (successPanel) {
+                successPanel.style.display = 'block';
+                successPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // Auto-send email after a small delay (non-blocking)
+            setTimeout(() => {
+                sendEmailWithEmailJS();
+            }, 500);
+
+        } catch (err) {
+            console.error('showSuccess error:', err);
+            isSubmitting = false;
+            setSubmitLoading(false);
+        }
     }
 
     function resetForm() {
         itemsState.fill(false);
         currentCategory = 'all';
         currentSection = 1;
+        isSubmitting = false;
         if (formContainer) formContainer.style.display = 'block';
         if (successPanel) successPanel.style.display = 'none';
         document.getElementById('weddingForm')?.reset();
         document.querySelectorAll('.priority-item input').forEach(cb => cb.checked = false);
         showSection(1);
         clearErrors();
+        setSubmitLoading(false);
         window.scrollTo(0, 0);
     }
 
     // Event binding
-    if (nextBtn) nextBtn.addEventListener('click', () => { if (validateSection(currentSection) && currentSection < totalSections) showSection(currentSection + 1); });
-    if (prevBtn) prevBtn.addEventListener('click', () => { if (currentSection > 1) showSection(currentSection - 1); });
-    steps.forEach((step, idx) => step.addEventListener('click', () => { if (idx + 1 <= currentSection) showSection(idx + 1); }));
-    if (submitBtn) submitBtn.addEventListener('click', () => { if (validateSection(4)) showSuccess(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (validateSection(currentSection) && currentSection < totalSections) showSection(currentSection + 1);
+    });
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+        if (currentSection > 1) showSection(currentSection - 1);
+    });
+    steps.forEach((step, idx) => step.addEventListener('click', () => {
+        if (idx + 1 <= currentSection) showSection(idx + 1);
+    }));
 
-    document.getElementById('downloadPdfFromSuccess')?.addEventListener('click', (e) => { e.preventDefault(); downloadPDF(); });
-    document.getElementById('sendEmailFromSuccess')?.addEventListener('click', (e) => { e.preventDefault(); generateAndSendEmail(); });
-    document.getElementById('startNewBtn')?.addEventListener('click', (e) => { e.preventDefault(); resetForm(); });
+    // ✅ FIX: Submit button properly guarded
+    if (submitBtn) submitBtn.addEventListener('click', () => {
+        if (isSubmitting) return;
+        if (validateSection(4)) showSuccess();
+    });
+
+    document.getElementById('downloadPdfFromSuccess')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const btn = e.currentTarget;
+        btn.textContent = '⏳ Generating PDF...';
+        btn.disabled = true;
+        downloadPDF().then(() => {
+            btn.textContent = '📄 Download PDF Summary';
+            btn.disabled = false;
+        }).catch(() => {
+            btn.textContent = '📄 Download PDF Summary';
+            btn.disabled = false;
+        });
+    });
+
+    document.getElementById('sendEmailFromSuccess')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendEmailWithEmailJS();
+    });
+
+    document.getElementById('startNewBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetForm();
+    });
 
     // Set min date
     const dateInput = document.getElementById('eventDate');
@@ -590,5 +702,5 @@
     // Initialize
     showSection(1);
     renderCrew();
-    console.log('App ready — EmailJS integrated. Submit & download buttons functional');
+    console.log('App ready — all fixes applied');
 })();
