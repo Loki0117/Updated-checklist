@@ -37,7 +37,6 @@ body {
     margin: 0 auto;
 }
 
-/* Header */
 .app-header {
     display: flex;
     justify-content: space-between;
@@ -82,7 +81,6 @@ body {
     letter-spacing: 1px;
 }
 
-/* Progress Steps */
 .progress-steps {
     display: flex;
     align-items: center;
@@ -137,7 +135,6 @@ body {
     background: var(--gray-light);
 }
 
-/* Form Container */
 .form-container {
     background: var(--white);
     border-radius: var(--radius);
@@ -164,7 +161,6 @@ body {
     opacity: 0.95;
 }
 
-/* Form Sections */
 .form-section {
     padding: 2rem 2.5rem;
     border-bottom: 1px solid var(--gray-light);
@@ -206,13 +202,6 @@ body {
     font-size: 0.95rem;
 }
 
-.section-help {
-    color: var(--gray);
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-}
-
-/* Form Elements */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -277,12 +266,6 @@ body {
     min-height: 20px;
 }
 
-.highlight-group textarea {
-    background: var(--orange-pale);
-    border-color: var(--orange-light);
-}
-
-/* Priority Grid */
 .priority-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -312,18 +295,6 @@ body {
     accent-color: var(--orange);
 }
 
-/* Category Description */
-.category-description {
-    background: var(--orange-pale);
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-    color: var(--dark);
-    border: 1px solid var(--orange-light);
-}
-
-/* Category Tabs */
 .category-tabs {
     display: flex;
     flex-wrap: wrap;
@@ -352,7 +323,6 @@ body {
     border-color: var(--orange);
 }
 
-/* Checklist */
 .checklist-container {
     background: var(--cream);
     border-radius: var(--radius);
@@ -455,7 +425,6 @@ body {
     color: white;
 }
 
-/* Progress */
 .checklist-progress {
     margin-top: 1rem;
 }
@@ -487,40 +456,6 @@ body {
     color: var(--orange);
 }
 
-/* Crew Display */
-.crew-display {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 1rem;
-}
-
-.crew-item {
-    background: var(--cream);
-    padding: 14px 16px;
-    border-radius: 12px;
-    font-size: 0.95rem;
-}
-
-.crew-item strong {
-    display: block;
-    color: var(--dark);
-    margin-bottom: 4px;
-}
-
-.crew-item span {
-    color: var(--gray);
-    font-size: 0.85rem;
-}
-
-.crew-note {
-    font-size: 0.85rem;
-    color: var(--gray);
-    margin-top: 1rem;
-    font-style: italic;
-}
-
-/* Confirmation */
 .success-note {
     background: var(--green-light);
     padding: 1.5rem;
@@ -549,7 +484,6 @@ body {
     accent-color: var(--orange);
 }
 
-/* Form Actions */
 .form-actions {
     padding: 1.5rem 2.5rem 2.5rem;
     display: flex;
@@ -606,7 +540,6 @@ body {
     color: var(--orange);
 }
 
-/* Success Panel */
 .success-panel {
     background: var(--white);
     border-radius: var(--radius);
@@ -620,12 +553,6 @@ body {
     font-size: 2.5rem;
     color: var(--orange);
     margin-bottom: 1.5rem;
-}
-
-.success-content p {
-    font-size: 1.1rem;
-    margin-bottom: 0.75rem;
-    color: var(--dark);
 }
 
 .action-group {
@@ -642,7 +569,6 @@ body {
     font-weight: 500;
 }
 
-/* Footer */
 .app-footer {
     text-align: center;
     margin-top: 3rem;
@@ -668,7 +594,6 @@ body {
     font-style: italic;
 }
 
-/* Responsive */
 @media (max-width: 700px) {
     body {
         padding: 1rem;
@@ -677,9 +602,6 @@ body {
         grid-template-columns: 1fr; 
     }
     .priority-grid { 
-        grid-template-columns: 1fr; 
-    }
-    .crew-display { 
         grid-template-columns: 1fr; 
     }
     .progress-steps { 
