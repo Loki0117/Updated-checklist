@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Oh Yes Events | Wedding Planning Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-section">
+                <h1 class="logo">Oh Yes Events</h1>
+                <span class="tagline">Your wedding, our passion</span>
+            </div>
+            <div class="stats-badge">
+                <span class="stat-number">500+</span>
+                <span class="stat-label">Happy Couples</span>
+            </div>
+        </header>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <span class="step-num">1</span>
+                <span class="step-name">Tell us about you</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="2">
+                <span class="step-num">2</span>
+                <span class="step-name">Your budget & dreams</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="3">
+                <span class="step-num">3</span>
+                <span class="step-name">What you need help with</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="4">
+                <span class="step-num">4</span>
+                <span class="step-name">Almost done!</span>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container" id="formContainer">
+            <div class="form-header">
+                <h2>Let's plan your perfect celebration</h2>
+                <p>We've made this super simple. Fields with * are important — the rest you can fill as you like.</p>
+            </div>
+            
+            <form id="weddingForm">
+                
+                <!-- SECTION 1: About You -->
+                <div class="form-section active" data-section="1">
+                    <div class="section-title">
+                        <span>About You & Your Celebration</span>
+                        <span class="section-badge">Tell us about yourself</span>
+                    </div>
+                    
+                    <div class="info-note">
+                        Don't worry if you're not sure about some details — just give your best guess. We'll help you figure out the rest!
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>How should we call you? <span class="required">*</span></label>
+                            <input type="text" id="clientName" required placeholder="e.g., Priya & Rahul">
+                            <div class="error-message" id="clientNameError"></div>
+                            <small>We'll text or call to say hello!</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone number <span class="required">*</span></label>
+                            <input type="tel" id="contactNumber" required placeholder="+91 98765 43210">
+                            <div class="error-message" id="contactNumberError"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Email address <span class="required">*</span></label>
+                            <input type="email" id="email" required placeholder="hello@example.com">
+                            <div class="error-message" id="emailError"></div>
+                            <small>We'll send you a beautiful summary</small>
+                        </div>
+                        <div class="form-group">
+                            <label>What are you celebrating? <span class="required">*</span></label>
+                            <select id="eventType" required>
+                                <option value="">Select one</option>
+                                <option value="Wedding">Wedding Ceremony</option>
+                                <option value="Engagement">Engagement Party</option>
+                                <option value="Reception">Wedding Reception</option>
+                                <option value="Sangeet/Mehendi">Sangeet / Mehendi Night</option>
+                                <option value="Destination Wedding">Destination Wedding</option>
+                                <option value="Anniversary">Anniversary Celebration</option>
+                            </select>
+                            <div class="error-message" id="eventTypeError"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>When is your big day? <span class="required">*</span></label>
+                            <input type="date" id="eventDate" required>
+                            <div class="error-message" id="eventDateError"></div>
+                            <small>Approximate date is perfectly fine</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Where will it be? <span class="required">*</span></label>
+                            <input type="text" id="venue" required placeholder="Venue name or city">
+                            <div class="error-message" id="venueError"></div>
+                            <small>We can also help you find the perfect venue!</small>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>How many guests? <span class="required">*</span></label>
+                            <input type="number" id="guestCount" required placeholder="e.g., 200">
+                            <div class="error-message" id="guestCountError"></div>
+                            <small>Just an approximate number</small>
+                        </div>
+                        <div class="form-group">
+                            <label>How many days of celebration? <span class="required">*</span></label>
+                            <select id="functionDays" required>
+                                <option value="">Select one</option>
+                                <option value="1">1 day — Simple & sweet</option>
+                                <option value="2">2 days — Mehendi + Wedding</option>
+                                <option value="3">3 days — Full wedding celebration</option>
+                                <option value="4+">4+ days — Grand multi-day event</option>
+                            </select>
+                            <div class="error-message" id="functionDaysError"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Budget & Dreams -->
+                <div class="form-section" data-section="2">
+                    <div class="section-title">
+                        <span>Your Budget & Dreams</span>
+                        <span class="section-badge">Help us understand</span>
+                    </div>
+
+                    <div class="info-note">
+                        We work with all budgets — from intimate to grand. Just share what's comfortable for you.
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Total budget (₹) <span class="required">*</span></label>
+                            <input type="number" id="totalBudget" required placeholder="e.g., 25,00,000">
+                            <div class="error-message" id="totalBudgetError"></div>
+                            <small>Don't worry — we respect every budget</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Budget status <span class="required">*</span></label>
+                            <select id="budgetStatus" required>
+                                <option value="">Select one</option>
+                                <option value="Approved">Approved & ready to book</option>
+                                <option value="Pending">Still discussing with family</option>
+                                <option value="Flexible">Flexible — open to suggestions</option>
+                            </select>
+                            <div class="error-message" id="budgetStatusError"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Where would you like to splurge?</label>
+                        <textarea id="budgetBreakdown" rows="2" placeholder="Example: Decor is most important to me, followed by food..."></textarea>
+                        <small>This helps us focus on what matters most to you</small>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Your favorite colors or theme</label>
+                            <input type="text" id="colorPalette" placeholder="e.g., Maroon & Gold, Pastel Pink">
+                            <small>Share any colors you love!</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Share inspiration links</label>
+                            <input type="text" id="referenceLinks" placeholder="Pinterest, Instagram links">
+                            <small>Show us what you love!</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload inspiration photos</label>
+                        <input type="file" id="referenceImages" accept="image/*" multiple>
+                        <small>You can select multiple images — we'd love to see your vision!</small>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Priorities -->
+                <div class="form-section" data-section="3">
+                    <div class="section-title">
+                        <span>What Matters Most to You?</span>
+                        <span class="section-badge">Pick your top priorities</span>
+                    </div>
+                    <p class="section-help">Select the things that are most important to you — we'll make sure these get extra love and attention!</p>
+                    
+                    <div class="priority-grid">
+                        <label class="priority-item"><input type="checkbox" value="Decor & Flowers"> Decor & Flowers — Make everything beautiful</label>
+                        <label class="priority-item"><input type="checkbox" value="Food & Catering"> Food & Catering — Delicious meals for everyone</label>
+                        <label class="priority-item"><input type="checkbox" value="Photography & Videos"> Photography & Videos — Capture every moment</label>
+                        <label class="priority-item"><input type="checkbox" value="Music & Entertainment"> Music & Entertainment — Keep the energy high</label>
+                        <label class="priority-item"><input type="checkbox" value="Venue & Logistics"> Venue & Logistics — Smooth arrangements</label>
+                        <label class="priority-item"><input type="checkbox" value="Guest Gifts & Experience"> Guest Gifts & Experience — Make guests feel special</label>
+                        <label class="priority-item"><input type="checkbox" value="Outfits & Makeup"> Outfits & Makeup — Looking your best</label>
+                        <label class="priority-item"><input type="checkbox" value="Invitations & Stationery"> Invitations & Stationery — Beautiful details</label>
+                    </div>
+
+                    <div class="form-group highlight-group">
+                        <label>Things that absolutely MUST happen <span class="required">*</span></label>
+                        <textarea id="nonNegotiables" rows="3" required placeholder="Tell us what's non-negotiable for your dream day"></textarea>
+                        <div class="error-message" id="nonNegotiablesError"></div>
+                        <small>This is YOUR day — tell us what's essential!</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Things you'd like to avoid (if any)</label>
+                        <textarea id="restrictions" rows="2" placeholder="Example: No pork/beef, No loud music after 10pm"></textarea>
+                        <small>We respect all preferences and restrictions</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Any important deadlines?</label>
+                        <textarea id="criticalDeadlines" rows="2" placeholder="Example: Invitations must go out by Dec 15"></textarea>
+                        <small>We'll help you stay on track!</small>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: Services Checklist + Crew + Confirmation -->
+                <div class="form-section" data-section="4">
+                    <div class="section-title">
+                        <span>Services We Can Arrange For You</span>
+                        <span class="section-badge">Check what you need</span>
+                    </div>
+                    <p class="section-help">Don't worry if you're not sure — just check what sounds helpful. We'll guide you through everything!</p>
+                    
+                    <div class="category-description" id="categoryDescription">
+                        <p>Select a category to see what's included</p>
+                    </div>
+                    
+                    <div class="category-tabs" id="categoryTabs"></div>
+                    
+                    <div class="checklist-container" id="checklistContainer"></div>
+                    
+                    <div class="checklist-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressText">0 of 90 tasks selected</span>
+                            <span class="progress-percent" id="progressPercent">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Event Day Crew -->
+                    <div style="margin-top: 40px;">
+                        <div class="section-title">
+                            <span>Our Event Day Dream Team</span>
+                            <span class="section-badge">Included with every package</span>
+                        </div>
+                        <p class="section-help">The amazing people who'll make everything run smoothly.</p>
+                        <div class="crew-display" id="crewDisplay"></div>
+                        <p class="crew-note">* Number of personnel allocated based on event scale and requirements</p>
+                    </div>
+
+                    <!-- Confirmation -->
+                    <div style="margin-top: 40px;">
+                        <div class="section-title">
+                            <span>One Last Step</span>
+                        </div>
+                        
+                        <div class="success-note">
+                            <p>Thank you for sharing your dreams with us! We'll review everything and get back to you within 24 hours.</p>
+                        </div>
+
+                        <label class="confirm-checkbox">
+                            <input type="checkbox" id="confirmationCheckbox" required>
+                            <span>Yes, I confirm that the information above is accurate. Oh Yes Events will contact me soon.</span>
+                        </label>
+                        <div class="error-message" id="confirmationError"></div>
+                        
+                        <label class="confirm-checkbox">
+                            <input type="checkbox" id="newsletterCheckbox">
+                            <span>I'd love to receive wedding tips and inspiration via email (optional)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline prev-step" data-prev style="display: none;">← Back</button>
+                    <button type="button" class="btn btn-primary next-step" data-next>Continue →</button>
+                    <button type="button" class="btn btn-primary" id="submitFormBtn" style="display: none;">Submit & Get Your Plan</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Panel -->
+        <div class="success-panel" id="successPanel" style="display: none;">
+            <div class="success-content">
+                <h2>Thank You, <span id="successClientName"></span>!</h2>
+                <p>Your celebration requirements have been received.</p>
+                <p>Our wedding expert will reach out to you within 24 hours.</p>
+                
+                <div class="selected-summary" id="selectedSummary" style="margin: 20px 0; text-align: left; background: #fef8f2; padding: 20px; border-radius: 16px;">
+                    <h3 style="margin-bottom: 15px; color: #e85d04;">Your Selections</h3>
+                    <div id="summaryContent"></div>
+                </div>
+                
+                <div class="action-group">
+                    <button class="btn btn-primary btn-large" id="downloadPdfFromSuccess">📄 Download PDF Summary</button>
+                    <button class="btn btn-outline btn-large" id="sendEmailFromSuccess">📧 Send to Planner</button>
+                </div>
+                <div id="emailStatus" class="status-message"></div>
+                <button class="btn-text" id="startNewBtn">Start a New Event</button>
+            </div>
+        </div>
+
+        <footer class="app-footer">
+            <p class="footer-quote">Schedule a consultation and tell us your story — we'll design the rest.</p>
+            <p class="footer-cta">Let's create magic. <span>Let's say, Oh Yes!</span></p>
+        </footer>
+    </div>
+    <!-- Add this before your script.js -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
