@@ -188,12 +188,6 @@
                             <small>Show us what you love!</small>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>Upload inspiration photos</label>
-                        <input type="file" id="referenceImages" accept="image/*" multiple>
-                        <small>You can select multiple images — we'd love to see your vision!</small>
-                    </div>
                 </div>
 
                 <!-- SECTION 3: Priorities -->
@@ -235,7 +229,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION 4: Services Checklist + Crew + Confirmation -->
+                <!-- SECTION 4: Services Checklist + Confirmation -->
                 <div class="form-section" data-section="4">
                     <div class="section-title">
                         <span>Services We Can Arrange For You</span>
@@ -259,17 +253,6 @@
                             <span id="progressText">0 of 90 tasks selected</span>
                             <span class="progress-percent" id="progressPercent">0%</span>
                         </div>
-                    </div>
-
-                    <!-- Event Day Crew -->
-                    <div style="margin-top: 40px;">
-                        <div class="section-title">
-                            <span>Our Event Day Dream Team</span>
-                            <span class="section-badge">Included with every package</span>
-                        </div>
-                        <p class="section-help">The amazing people who'll make everything run smoothly.</p>
-                        <div class="crew-display" id="crewDisplay"></div>
-                        <p class="crew-note">* Number of personnel allocated based on event scale and requirements</p>
                     </div>
 
                     <!-- Confirmation -->
@@ -299,7 +282,7 @@
                 <div class="form-actions">
                     <button type="button" class="btn btn-outline prev-step" data-prev style="display: none;">← Back</button>
                     <button type="button" class="btn btn-primary next-step" data-next>Continue →</button>
-                    <button type="button" class="btn btn-primary" id="submitFormBtn" style="display: none;">Submit & Get Your Plan</button>
+                    <button type="button" class="btn btn-primary" id="submitFormBtn" style="display: none;">✨ Submit & Get Your Plan</button>
                 </div>
             </form>
         </div>
@@ -311,7 +294,7 @@
                 <p>Your celebration requirements have been received.</p>
                 <p>Our wedding expert will reach out to you within 24 hours.</p>
                 
-                <div class="selected-summary" id="selectedSummary" style="margin: 20px 0; text-align: left; background: #fef8f2; padding: 20px; border-radius: 16px;">
+                <div class="selected-summary" style="margin: 20px 0; text-align: left; background: #fef8f2; padding: 20px; border-radius: 16px;">
                     <h3 style="margin-bottom: 15px; color: #e85d04;">Your Selections</h3>
                     <div id="summaryContent"></div>
                 </div>
@@ -330,7 +313,7 @@
             <p class="footer-cta">Let's create magic. <span>Let's say, Oh Yes!</span></p>
         </footer>
     </div>
-    <!-- Add this before your script.js -->
+    
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="script.js"></script>
 </body>
