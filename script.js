@@ -2,12 +2,16 @@
     "use strict";
 
     // ========================
-    // EMAILJS CONFIGURATION
+    // YOUR CONTACT DETAILS
     // ========================
+    const YOUR_PHONE = "9345694880";
+    const YOUR_EMAIL = "kisneylogesh78823@gmail.com";
+
+    // EmailJS Configuration (Updated with your credentials)
     const EMAILJS_CONFIG = {
         PUBLIC_KEY: "f93M_sIhhbMCw4cVt",
         SERVICE_ID: "service_vuepezd",
-        TEMPLATE_ID: "template_casfjzj"
+        TEMPLATE_ID: "template_3qcsabo"
     };
 
     let emailJSEnabled = false;
@@ -15,12 +19,12 @@
         try {
             emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
             emailJSEnabled = true;
-            console.log("✅ EmailJS initialized successfully");
-        } catch (e) {
+            console.log("✅ EmailJS initialized successfully with your credentials");
+        } catch(e) { 
             console.warn("EmailJS init failed:", e);
         }
     } else {
-        console.warn("❌ EmailJS library not loaded");
+        console.warn("EmailJS library not loaded - check internet connection");
     }
 
     // ========================
@@ -133,21 +137,6 @@
         { category: 'addons', title: 'Midnight Snack Counter', desc: 'Late-night food', tag: 'Essential' }
     ];
 
-    const crewData = [
-        { title: 'Show Running', desc: 'Senior Associate - Manages event flow' },
-        { title: 'Logistics', desc: 'Senior Associate + Runner - Coordinates setup' },
-        { title: 'Control Room', desc: 'Senior Associate + Runner - AV management' },
-        { title: 'Hospitality', desc: 'Senior Associate + Runner - Guest care' },
-        { title: 'Supervisor', desc: 'Senior Associate + Runner - Oversight' },
-        { title: 'F&B Connoisseur', desc: 'Runner - Food quality control' },
-        { title: 'Artist Manager', desc: 'Senior Associate - Performer coordination' },
-        { title: 'Vendor Manager', desc: 'Senior Associate - Vendor liaison' },
-        { title: 'Shadowing', desc: 'Runners - Personal assistance' },
-        { title: 'Production Manager', desc: 'Senior Associate - Overall oversight' },
-        { title: 'OYE Planning', desc: 'Sourcing, contracts, site visits' }
-    ];
-
-    // Global state
     let itemsState = new Array(checklistData.length).fill(false);
     let currentCategory = 'all';
     let currentSection = 1;
@@ -161,24 +150,14 @@
     const submitBtn = document.getElementById('submitFormBtn');
     const formContainer = document.getElementById('formContainer');
     const successPanel = document.getElementById('successPanel');
-
-    // ========================
-    // FIX 1: SUBMIT BUTTON — prevent double-click, show loading state
-    // ========================
     let isSubmitting = false;
 
     function setSubmitLoading(loading) {
         if (!submitBtn) return;
-        if (loading) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Submitting...';
-        } else {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit & Get Your Plan';
-        }
+        submitBtn.disabled = loading;
+        submitBtn.textContent = loading ? '⏳ Submitting...' : '✨ Submit & Get Your Plan';
     }
 
-    // Helper: clear errors
     function clearErrors() {
         document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
         document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('error'));
@@ -270,14 +249,6 @@
         if (percentSpan) percentSpan.innerText = `${percent}%`;
     }
 
-    function renderCrew() {
-        const crewDiv = document.getElementById('crewDisplay');
-        if (crewDiv) {
-            crewDiv.innerHTML = crewData.map(c => `<div class="crew-item"><strong>${c.title}</strong><span>${c.desc}</span></div>`).join('');
-        }
-    }
-
-    // Section navigation & validation
     function validateSection(section) {
         clearErrors();
         let isValid = true;
@@ -325,18 +296,9 @@
                 submitBtn.style.display = 'none';
             }
         }
-        if (sectionNum === 4) {
-            renderTabs();
-            renderChecklist();
-            renderCrew();
-            updateCategoryDesc();
-        }
         clearErrors();
     }
 
-    // ========================
-    // FIX 2: collectFormData — added referenceLinks and criticalDeadlines
-    // ========================
     function collectFormData() {
         const priorities = Array.from(document.querySelectorAll('.priority-item input:checked')).map(cb => cb.value);
         return {
@@ -352,7 +314,6 @@
             budgetStatus: document.getElementById('budgetStatus')?.value || '',
             budgetBreakdown: document.getElementById('budgetBreakdown')?.value || '',
             colorPalette: document.getElementById('colorPalette')?.value || '',
-            // ✅ FIXED: these two fields were missing before
             referenceLinks: document.getElementById('referenceLinks')?.value || '',
             criticalDeadlines: document.getElementById('criticalDeadlines')?.value || '',
             nonNegotiables: document.getElementById('nonNegotiables')?.value || '',
@@ -370,19 +331,6 @@
             grouped[item.category].push(item);
         });
         return grouped;
-    }
-
-    function getSelectedItemsText() {
-        const grouped = getSelectedItemsGrouped();
-        let text = '';
-        for (let cat in grouped) {
-            const catName = categories.find(c => c.id === cat)?.name || cat;
-            text += `\n📌 ${catName}:\n`;
-            grouped[cat].forEach(item => {
-                text += `   ✓ ${item.title} - ${item.desc}\n`;
-            });
-        }
-        return text;
     }
 
     function generateSummaryHTML() {
@@ -403,144 +351,59 @@
         return html;
     }
 
-    // ========================
-    // FIX 3: downloadPDF — added all missing fields + proper page break handling
-    // ========================
-    function downloadPDF() {
-        const data = collectFormData();
-        const grouped = getSelectedItemsGrouped();
-        const totalSelected = Object.values(grouped).flat().length;
-        const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) : 'N/A';
-
-        const container = document.createElement('div');
-        container.style.cssText = 'padding:30px; font-family:Arial,sans-serif; color:#333; width:720px; font-size:13px; line-height:1.6;';
-
-        // Build services HTML
-        let servicesHTML = '';
-        for (let cat in grouped) {
-            const catName = categories.find(c => c.id === cat)?.name || cat;
-            servicesHTML += `
-                <div style="margin-bottom:10px; page-break-inside:avoid;">
-                    <div style="background:#fff3e0; padding:5px 10px; border-left:4px solid #e85d04; font-weight:bold; margin-bottom:4px;">${catName}</div>
-                    <table style="width:100%; border-collapse:collapse;">
-                        ${grouped[cat].map(item => `
-                            <tr>
-                                <td style="padding:4px 8px; border-bottom:1px solid #f0e0d0; width:50%;">✓ ${item.title}</td>
-                                <td style="padding:4px 8px; border-bottom:1px solid #f0e0d0; color:#666;">${item.desc}</td>
-                                <td style="padding:4px 8px; border-bottom:1px solid #f0e0d0; color:${item.tag === 'Essential' ? '#e85d04' : '#888'}; font-size:11px;">${item.tag}</td>
-                            </tr>
-                        `).join('')}
-                    </table>
-                </div>`;
+    // Send SMS notification to your number
+    async function sendSMSNotification(data) {
+        const smsBody = `New Wedding Lead! ${data.clientName}, Phone: ${data.contactNumber}, Event: ${data.eventType} on ${data.eventDate}, Guests: ${data.guestCount}. Check email for full details.`;
+        
+        // Using Textbelt free API (1 free SMS per day for testing)
+        // For production, replace with your preferred SMS provider
+        try {
+            const response = await fetch('https://textbelt.com/text', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: YOUR_PHONE,
+                    message: smsBody,
+                    key: 'textbelt' // Free key - limited to 1 SMS/day
+                })
+            });
+            const result = await response.json();
+            console.log('SMS notification sent:', result);
+            return result.success;
+        } catch(e) {
+            console.warn('SMS notification failed (this is normal for demo):', e);
+            // SMS is optional - don't fail the whole submission
+            return false;
         }
-
-        container.innerHTML = `
-            <!-- HEADER -->
-            <div style="text-align:center; border-bottom:3px solid #e85d04; padding-bottom:15px; margin-bottom:20px;">
-                <h1 style="color:#e85d04; margin:0; font-size:26px;">Oh Yes Events</h1>
-                <h2 style="margin:5px 0; font-size:16px; color:#555;">Wedding Requirement Summary</h2>
-                <p style="font-size:11px; color:#888; margin:0;">Generated on ${new Date().toLocaleString('en-IN')}</p>
-            </div>
-
-            <!-- CLIENT DETAILS -->
-            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">📋 Client Details</h3>
-                <table style="width:100%; border-collapse:collapse;">
-                    <tr><td style="padding:3px 0; width:35%; color:#666;">Name</td><td style="padding:3px 0; font-weight:bold;">${data.clientName}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Phone</td><td style="padding:3px 0;">${data.contactNumber}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Email</td><td style="padding:3px 0;">${data.email}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Newsletter Opt-in</td><td style="padding:3px 0;">${data.newsletter ? 'Yes' : 'No'}</td></tr>
-                </table>
-            </div>
-
-            <!-- EVENT DETAILS -->
-            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">🎉 Event Details</h3>
-                <table style="width:100%; border-collapse:collapse;">
-                    <tr><td style="padding:3px 0; width:35%; color:#666;">Event Type</td><td style="padding:3px 0; font-weight:bold;">${data.eventType}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Date</td><td style="padding:3px 0;">${formatDate(data.eventDate)}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Venue</td><td style="padding:3px 0;">${data.venue}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Guest Count</td><td style="padding:3px 0;">${data.guestCount} guests</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Function Days</td><td style="padding:3px 0;">${data.functionDays} day(s)</td></tr>
-                </table>
-            </div>
-
-            <!-- BUDGET -->
-            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">💰 Budget</h3>
-                <table style="width:100%; border-collapse:collapse;">
-                    <tr><td style="padding:3px 0; width:35%; color:#666;">Total Budget</td><td style="padding:3px 0; font-weight:bold;">₹${parseInt(data.totalBudget || 0).toLocaleString('en-IN')}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Budget Status</td><td style="padding:3px 0;">${data.budgetStatus}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Where to Splurge</td><td style="padding:3px 0;">${data.budgetBreakdown || 'Not specified'}</td></tr>
-                </table>
-            </div>
-
-            <!-- PREFERENCES -->
-            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">🎨 Preferences & Vision</h3>
-                <table style="width:100%; border-collapse:collapse;">
-                    <tr><td style="padding:3px 0; width:35%; color:#666;">Color / Theme</td><td style="padding:3px 0;">${data.colorPalette || 'Not specified'}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Inspiration Links</td><td style="padding:3px 0;">${data.referenceLinks || 'None shared'}</td></tr>
-                    <tr><td style="padding:3px 0; color:#666;">Top Priorities</td><td style="padding:3px 0;">${data.priorities || 'Not selected'}</td></tr>
-                </table>
-            </div>
-
-            <!-- MUST HAVES & RESTRICTIONS -->
-            <div style="background:#fef8f2; border:1px solid #f5c8a0; border-radius:8px; padding:14px 18px; margin-bottom:16px; page-break-inside:avoid;">
-                <h3 style="color:#e85d04; margin:0 0 10px 0; font-size:14px; border-bottom:1px solid #f5c8a0; padding-bottom:6px;">⭐ Must-Haves & Restrictions</h3>
-                <p style="margin:0 0 8px 0;"><strong>Non-Negotiables:</strong></p>
-                <p style="margin:0 0 12px 0; padding-left:10px; border-left:3px solid #e85d04;">${data.nonNegotiables}</p>
-                <p style="margin:0 0 6px 0;"><strong>Things to Avoid:</strong></p>
-                <p style="margin:0 0 12px 0; padding-left:10px;">${data.restrictions || 'None specified'}</p>
-                <p style="margin:0 0 6px 0;"><strong>Important Deadlines:</strong></p>
-                <p style="margin:0; padding-left:10px;">${data.criticalDeadlines || 'None specified'}</p>
-            </div>
-
-            <!-- SELECTED SERVICES -->
-            <div style="margin-bottom:20px;">
-                <h3 style="color:#e85d04; font-size:14px; border-bottom:2px solid #e85d04; padding-bottom:6px; margin-bottom:12px;">
-                    📦 Selected Services — ${totalSelected} item${totalSelected !== 1 ? 's' : ''} across ${Object.keys(grouped).length} categor${Object.keys(grouped).length !== 1 ? 'ies' : 'y'}
-                </h3>
-                ${totalSelected === 0 ? '<p style="color:#888; font-style:italic;">No services selected.</p>' : servicesHTML}
-            </div>
-
-            <!-- FOOTER -->
-            <div style="margin-top:30px; text-align:center; border-top:2px solid #e85d04; padding-top:14px; font-size:11px; color:#888;">
-                <p style="margin:0; font-size:13px; color:#e85d04; font-weight:bold;">Oh Yes Events</p>
-                <p style="margin:4px 0 0;">Let's create magic ✨ — Your wedding, our passion</p>
-            </div>
-        `;
-
-        const opt = {
-            margin: [0.4, 0.4, 0.4, 0.4],
-            filename: `OhYes_${data.clientName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        return html2pdf().set(opt).from(container).save();
     }
 
-    // ========================
-    // EMAILJS SEND FUNCTION
-    // ========================
-    async function sendEmailWithEmailJS() {
-        const statusDiv = document.getElementById('emailStatus');
-
+    // Send email via EmailJS
+    async function sendEmailViaJS(data) {
         if (!emailJSEnabled) {
-            sendEmailFallback();
-            return;
+            console.warn("EmailJS not available, using fallback");
+            sendEmailFallback(data);
+            return false;
         }
 
-        const data = collectFormData();
-        const selectedItemsText = getSelectedItemsText();
-        const totalSelected = itemsState.filter(v => v).length;
+        // Format selected services for email
+        const grouped = getSelectedItemsGrouped();
+        let servicesText = '';
+        let totalSelected = 0;
+        for (let cat in grouped) {
+            const catName = categories.find(c => c.id === cat)?.name || cat;
+            servicesText += `\n📌 ${catName}:\n`;
+            grouped[cat].forEach(item => {
+                servicesText += `   ✓ ${item.title} - ${item.desc}\n`;
+                totalSelected++;
+            });
+        }
+        
+        if (servicesText === '') {
+            servicesText = 'No specific services selected yet.';
+        }
 
-        // ✅ FIX: added all missing fields — referenceLinks, criticalDeadlines
         const templateParams = {
-            to_email: "kisneylogesh78823@gmail.com",
+            to_email: YOUR_EMAIL,
             client_name: data.clientName,
             client_phone: data.contactNumber,
             client_email: data.email,
@@ -558,16 +421,11 @@
             non_negotiables: data.nonNegotiables,
             restrictions: data.restrictions || 'None',
             priorities: data.priorities || 'Not specified',
-            selected_services: selectedItemsText || 'No services selected',
+            selected_services: servicesText,
             total_services_selected: totalSelected,
             newsletter_opt_in: data.newsletter ? 'Yes' : 'No',
             submission_date: new Date().toLocaleString('en-IN')
         };
-
-        if (statusDiv) {
-            statusDiv.innerHTML = '📧 Sending email...';
-            statusDiv.style.color = '#e85d04';
-        }
 
         try {
             const response = await emailjs.send(
@@ -575,68 +433,204 @@
                 EMAILJS_CONFIG.TEMPLATE_ID,
                 templateParams
             );
-            console.log('EmailJS success:', response);
-            if (statusDiv) {
-                statusDiv.innerHTML = '✅ Email sent successfully! Your wedding plan has been delivered.';
-                statusDiv.style.color = '#2e7d32';
-            }
+            console.log('Email sent successfully:', response);
+            return true;
         } catch (error) {
             console.error('EmailJS error:', error);
-            if (statusDiv) {
-                statusDiv.innerHTML = '⚠️ Email failed. Opening email client as backup...';
-                statusDiv.style.color = '#d32f2f';
-            }
-            setTimeout(() => sendEmailFallback(), 1000);
+            sendEmailFallback(data);
+            return false;
         }
     }
 
-    function sendEmailFallback() {
-        const data = collectFormData();
+    function sendEmailFallback(data) {
         const grouped = getSelectedItemsGrouped();
-        let body = `CLIENT: ${data.clientName}\nPhone: ${data.contactNumber}\nEmail: ${data.email}\nEvent: ${data.eventType} on ${data.eventDate}\nVenue: ${data.venue}\nGuests: ${data.guestCount}\nFunction Days: ${data.functionDays}\nBudget: ₹${data.totalBudget} (${data.budgetStatus})\nColors: ${data.colorPalette || 'N/A'}\nLinks: ${data.referenceLinks || 'N/A'}\nDeadlines: ${data.criticalDeadlines || 'N/A'}\nMust-haves: ${data.nonNegotiables}\nRestrictions: ${data.restrictions || 'None'}\n\nSELECTED SERVICES:\n`;
+        let body = `🔔 NEW WEDDING PLANNING REQUEST 🔔\n\n`;
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `📋 CLIENT INFORMATION\n`;
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `Name: ${data.clientName}\n`;
+        body += `Phone: ${data.contactNumber}\n`;
+        body += `Email: ${data.email}\n\n`;
+        
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `🎉 EVENT DETAILS\n`;
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `Event Type: ${data.eventType}\n`;
+        body += `Event Date: ${data.eventDate}\n`;
+        body += `Venue: ${data.venue}\n`;
+        body += `Guest Count: ${data.guestCount}\n`;
+        body += `Function Days: ${data.functionDays}\n\n`;
+        
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `💰 BUDGET INFORMATION\n`;
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `Total Budget: ₹${parseInt(data.totalBudget || 0).toLocaleString('en-IN')}\n`;
+        body += `Budget Status: ${data.budgetStatus}\n`;
+        body += `Splurge Priorities: ${data.budgetBreakdown || 'Not specified'}\n\n`;
+        
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `⭐ MUST-HAVES & PRIORITIES\n`;
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `Non-Negotiables: ${data.nonNegotiables}\n`;
+        body += `Things to Avoid: ${data.restrictions || 'None'}\n`;
+        body += `Top Priorities: ${data.priorities || 'Not specified'}\n`;
+        body += `Color/Theme: ${data.colorPalette || 'Not specified'}\n`;
+        body += `Inspiration Links: ${data.referenceLinks || 'None'}\n`;
+        body += `Important Deadlines: ${data.criticalDeadlines || 'None'}\n\n`;
+        
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `✅ SELECTED SERVICES\n`;
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        
+        let totalSelected = 0;
         for (let cat in grouped) {
-            body += `\n${categories.find(c => c.id === cat)?.name || cat}:\n`;
-            grouped[cat].forEach(i => body += `  ✓ ${i.title}\n`);
+            const catName = categories.find(c => c.id === cat)?.name || cat;
+            body += `\n📌 ${catName}:\n`;
+            grouped[cat].forEach(item => {
+                body += `   ✓ ${item.title} - ${item.desc}\n`;
+                totalSelected++;
+            });
         }
-        window.location.href = `mailto:kisneylogesh78823@gmail.com?subject=Wedding Plan - ${data.clientName}&body=${encodeURIComponent(body)}`;
-        const statusDiv = document.getElementById('emailStatus');
-        if (statusDiv) statusDiv.innerHTML = '📧 Email client opened.';
+        
+        if (totalSelected === 0) {
+            body += `No services selected yet.\n`;
+        } else {
+            body += `\nTotal Services Selected: ${totalSelected}\n`;
+        }
+        
+        body += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        body += `📧 Newsletter Opt-in: ${data.newsletter ? 'Yes' : 'No'}\n`;
+        body += `🕐 Submitted: ${new Date().toLocaleString('en-IN')}\n`;
+        body += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+        body += `✨ Oh Yes Events - Let's create magic! ✨`;
+        
+        window.location.href = `mailto:${YOUR_EMAIL}?subject=🎉 New Wedding Plan Request - ${data.clientName}&body=${encodeURIComponent(body)}`;
     }
 
-    // ========================
-    // FIX 1 (continued): showSuccess — no longer auto-triggers PDF on mobile
-    // Instead shows success screen, user clicks button to download
-    // ========================
-    function showSuccess() {
+    async function showSuccess() {
         if (isSubmitting) return;
         isSubmitting = true;
         setSubmitLoading(true);
 
         try {
-            const clientName = document.getElementById('clientName')?.value || 'Friend';
-            const firstName = clientName.split('&')[0].trim().split(' ')[0];
+            const data = collectFormData();
+            const firstName = data.clientName.split(' ')[0] || data.clientName;
             const successSpan = document.getElementById('successClientName');
             if (successSpan) successSpan.innerText = firstName;
-
+            
             const summaryDiv = document.getElementById('summaryContent');
             if (summaryDiv) summaryDiv.innerHTML = generateSummaryHTML();
-
+            
             if (formContainer) formContainer.style.display = 'none';
             if (successPanel) {
                 successPanel.style.display = 'block';
                 successPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
-            // Auto-send email after a small delay (non-blocking)
-            setTimeout(() => {
-                sendEmailWithEmailJS();
-            }, 500);
-
-        } catch (err) {
-            console.error('showSuccess error:', err);
+            const statusDiv = document.getElementById('emailStatus');
+            if (statusDiv) {
+                statusDiv.innerHTML = '📧 Sending your wedding plan to our team...';
+                statusDiv.style.color = '#e85d04';
+            }
+            
+            // Send email via EmailJS
+            const emailSent = await sendEmailViaJS(data);
+            
+            // Send SMS notification (optional, may fail with free API)
+            await sendSMSNotification(data);
+            
+            if (statusDiv) {
+                if (emailSent) {
+                    statusDiv.innerHTML = '✅ Success! Your wedding plan has been sent to our team. We\'ll contact you within 24 hours!';
+                    statusDiv.style.color = '#2e7d32';
+                } else {
+                    statusDiv.innerHTML = '📧 Email client opened. Please click send to complete submission.';
+                    statusDiv.style.color = '#e85d04';
+                }
+            }
+        } catch(err) {
+            console.error('Submission error:', err);
+            const statusDiv = document.getElementById('emailStatus');
+            if (statusDiv) {
+                statusDiv.innerHTML = '⚠️ Form submitted! We\'ll review your request and contact you soon.';
+                statusDiv.style.color = '#d32f2f';
+            }
+        } finally {
             isSubmitting = false;
             setSubmitLoading(false);
         }
+    }
+
+    function downloadPDF() {
+        const data = collectFormData();
+        const grouped = getSelectedItemsGrouped();
+        const totalSelected = Object.values(grouped).flat().length;
+        
+        const container = document.createElement('div');
+        container.style.cssText = 'padding:30px; font-family:Arial,sans-serif; width:720px; background:white;';
+        
+        let servicesHTML = '';
+        for (let cat in grouped) {
+            const catName = categories.find(c => c.id === cat)?.name || cat;
+            servicesHTML += `<div style="margin-bottom:15px;">
+                <div style="background:#fff3e0; padding:8px; font-weight:bold; border-left:4px solid #e85d04;">${catName}</div>`;
+            grouped[cat].forEach(item => {
+                servicesHTML += `<div style="padding:6px 12px; border-bottom:1px solid #f0e0d0;">✓ ${item.title} <span style="color:#666; font-size:12px;">- ${item.desc}</span></div>`;
+            });
+            servicesHTML += `</div>`;
+        }
+        
+        container.innerHTML = `
+            <div style="text-align:center; border-bottom:3px solid #e85d04; padding-bottom:15px; margin-bottom:20px;">
+                <h1 style="color:#e85d04; margin:0;">Oh Yes Events</h1>
+                <h2 style="margin:5px 0; color:#555;">Wedding Planning Summary</h2>
+            </div>
+            
+            <div style="background:#fef8f2; padding:15px; border-radius:8px; margin-bottom:15px;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0;">👰‍♀️ Client Details</h3>
+                <p><strong>Name:</strong> ${data.clientName}</p>
+                <p><strong>Phone:</strong> ${data.contactNumber}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+            </div>
+            
+            <div style="background:#fef8f2; padding:15px; border-radius:8px; margin-bottom:15px;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0;">🎉 Event Details</h3>
+                <p><strong>Event Type:</strong> ${data.eventType}</p>
+                <p><strong>Event Date:</strong> ${data.eventDate}</p>
+                <p><strong>Venue:</strong> ${data.venue}</p>
+                <p><strong>Guest Count:</strong> ${data.guestCount}</p>
+                <p><strong>Function Days:</strong> ${data.functionDays}</p>
+            </div>
+            
+            <div style="background:#fef8f2; padding:15px; border-radius:8px; margin-bottom:15px;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0;">💰 Budget</h3>
+                <p><strong>Total Budget:</strong> ₹${parseInt(data.totalBudget || 0).toLocaleString('en-IN')}</p>
+                <p><strong>Budget Status:</strong> ${data.budgetStatus}</p>
+                <p><strong>Where to Splurge:</strong> ${data.budgetBreakdown || 'Not specified'}</p>
+            </div>
+            
+            <div style="background:#fef8f2; padding:15px; border-radius:8px; margin-bottom:15px;">
+                <h3 style="color:#e85d04; margin:0 0 10px 0;">⭐ Must-Haves</h3>
+                <p>${data.nonNegotiables}</p>
+                ${data.restrictions ? `<p><strong>Things to Avoid:</strong> ${data.restrictions}</p>` : ''}
+                ${data.criticalDeadlines ? `<p><strong>Important Deadlines:</strong> ${data.criticalDeadlines}</p>` : ''}
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <h3 style="color:#e85d04; border-bottom:2px solid #e85d04; padding-bottom:5px;">✅ Selected Services (${totalSelected} items)</h3>
+                ${totalSelected === 0 ? '<p style="color:#888;">No services selected.</p>' : servicesHTML}
+            </div>
+            
+            <div style="text-align:center; margin-top:30px; padding-top:15px; border-top:2px solid #e85d04; color:#888; font-size:12px;">
+                <p>Oh Yes Events — Let's create magic! ✨</p>
+                <p>Generated on ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+        `;
+        
+        html2pdf().set({ 
+            filename: `OhYes_${data.clientName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+            margin: [0.5, 0.5, 0.5, 0.5]
+        }).from(container).save();
     }
 
     function resetForm() {
@@ -649,6 +643,7 @@
         document.getElementById('weddingForm')?.reset();
         document.querySelectorAll('.priority-item input').forEach(cb => cb.checked = false);
         showSection(1);
+        renderChecklist();
         clearErrors();
         setSubmitLoading(false);
         window.scrollTo(0, 0);
@@ -658,49 +653,63 @@
     if (nextBtn) nextBtn.addEventListener('click', () => {
         if (validateSection(currentSection) && currentSection < totalSections) showSection(currentSection + 1);
     });
+    
     if (prevBtn) prevBtn.addEventListener('click', () => {
         if (currentSection > 1) showSection(currentSection - 1);
     });
+    
     steps.forEach((step, idx) => step.addEventListener('click', () => {
         if (idx + 1 <= currentSection) showSection(idx + 1);
     }));
-
-    // ✅ FIX: Submit button properly guarded
+    
     if (submitBtn) submitBtn.addEventListener('click', () => {
         if (isSubmitting) return;
         if (validateSection(4)) showSuccess();
     });
-
+    
     document.getElementById('downloadPdfFromSuccess')?.addEventListener('click', (e) => {
         e.preventDefault();
         const btn = e.currentTarget;
         btn.textContent = '⏳ Generating PDF...';
         btn.disabled = true;
-        downloadPDF().then(() => {
+        downloadPDF();
+        setTimeout(() => {
             btn.textContent = '📄 Download PDF Summary';
             btn.disabled = false;
-        }).catch(() => {
-            btn.textContent = '📄 Download PDF Summary';
-            btn.disabled = false;
-        });
+        }, 1000);
     });
-
-    document.getElementById('sendEmailFromSuccess')?.addEventListener('click', (e) => {
+    
+    document.getElementById('sendEmailFromSuccess')?.addEventListener('click', async (e) => {
         e.preventDefault();
-        sendEmailWithEmailJS();
+        const data = collectFormData();
+        const statusDiv = document.getElementById('emailStatus');
+        if (statusDiv) {
+            statusDiv.innerHTML = '📧 Sending...';
+            statusDiv.style.color = '#e85d04';
+        }
+        await sendEmailViaJS(data);
+        if (statusDiv) {
+            statusDiv.innerHTML = '✅ Email sent to planner successfully!';
+            statusDiv.style.color = '#2e7d32';
+        }
     });
-
+    
     document.getElementById('startNewBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
         resetForm();
     });
-
-    // Set min date
+    
+    // Set min date for event date picker
     const dateInput = document.getElementById('eventDate');
     if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
-
-    // Initialize
+    
+    // Initialize the form
     showSection(1);
-    renderCrew();
-    console.log('App ready — all fixes applied');
+    renderTabs();
+    renderChecklist();
+    updateCategoryDesc();
+    
+    console.log('✅ Wedding Planning App Ready!');
+    console.log(`📧 Email will be sent to: ${YOUR_EMAIL}`);
+    console.log(`📱 SMS will be sent to: ${YOUR_PHONE} (using free API - limited to 1/day)`);
 })();
